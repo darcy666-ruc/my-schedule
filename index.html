@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人日程 · 2026秋</title>
+<style>
+  :root{
+    --ruc:#A6192E;
+    --ruc-dark:#8C1526;
+    --ruc-light:#FBF3F4;
+    --ink:#2B2B2B;
+    --muted:#8A8A8A;
+    --line:#EFE6E7;
+    --bg:#FFFFFF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:28px 18px 48px;}
+
+  header{border-bottom:3px solid var(--ruc);padding-bottom:16px;margin-bottom:22px;}
+  .school{display:flex;align-items:center;gap:10px;}
+  .badge{
+    width:38px;height:38px;border-radius:50%;background:var(--ruc);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:700;letter-spacing:1px;flex-shrink:0;
+  }
+  .school .t1{font-size:17px;font-weight:700;color:var(--ruc);}
+  .school .t2{font-size:12px;color:var(--muted);letter-spacing:2px;}
+  h1{font-size:24px;font-weight:800;margin-top:12px;}
+  h1 em{font-style:normal;color:var(--ruc);}
+  .sub{font-size:13px;color:var(--muted);margin-top:4px;}
+
+  .cal{border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    box-shadow:0 2px 12px rgba(166,25,46,.05);margin-bottom:18px;}
+  .cal-head{background:var(--ruc);color:#fff;display:flex;align-items:center;
+    justify-content:space-between;padding:12px 16px;}
+  .cal-head .ym{font-size:16px;font-weight:700;letter-spacing:1px;}
+  .cal-head .tip{font-size:12px;opacity:.9;}
+  .cal-week,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-week{background:var(--ruc-light);}
+  .cal-week div{text-align:center;font-size:12px;color:var(--ruc);font-weight:600;padding:8px 0;}
+  .cal-grid div.day{
+    aspect-ratio:1/1;min-height:58px;border-top:1px solid var(--line);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-size:15px;color:#BBB;gap:2px;position:relative;
+  }
+  .cal-grid div.day:nth-child(7n){border-right:none;}
+  .cal-grid div.day.has{color:var(--ink);cursor:pointer;font-weight:600;transition:background .15s;}
+  .cal-grid div.day.has:hover{background:var(--ruc-light);}
+  .cal-grid div.day.has .dot{width:6px;height:6px;border-radius:50%;background:var(--ruc);}
+  .cal-grid div.day.active{background:var(--ruc);color:#fff;}
+  .cal-grid div.day.active .dot{background:#fff;}
+  .cal-grid div.day.today::after{
+    content:"今天";position:absolute;top:3px;right:4px;font-size:9px;color:var(--ruc);font-weight:700;
+  }
+  .cal-grid div.day.active.today::after{color:#fff;}
+
+  .detail{margin-top:4px;display:none;}
+  .detail.show{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .d-date{display:flex;align-items:baseline;gap:10px;
+    border-left:5px solid var(--ruc);padding-left:12px;margin-bottom:14px;}
+  .d-date .d1{font-size:20px;font-weight:800;color:var(--ruc);}
+  .d-date .d2{font-size:13px;color:var(--muted);}
+  .event{border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    margin-bottom:12px;background:#fff;position:relative;}
+  .event::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;
+    background:var(--ruc);border-radius:0 4px 4px 0;}
+  .event .time{display:inline-block;background:var(--ruc);color:#fff;font-size:12px;
+    font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:6px;}
+  .event .time.soft{background:var(--ruc-light);color:var(--ruc);}
+  .event .name{font-size:15px;font-weight:700;margin-bottom:3px;}
+  .event .loc{font-size:13px;color:var(--ruc-dark);font-weight:600;}
+  .event .note{font-size:13px;color:var(--muted);margin-top:5px;white-space:pre-line;}
+  .event .note b{color:var(--ruc-dark);}
+  .memo{
+    width:100%;margin-top:8px;min-height:54px;resize:vertical;
+    border:1.5px dashed var(--ruc);border-radius:8px;padding:8px 10px;
+    font-family:inherit;font-size:13px;color:var(--ink);background:#FFFDFD;box-sizing:border-box;
+  }
+  .memo:focus{outline:none;border-style:solid;background:#fff;}
+
+  footer{margin-top:28px;text-align:center;font-size:12px;color:var(--muted);
+    border-top:1px solid var(--line);padding-top:14px;}
+  footer b{color:var(--ruc);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="school">
+      <div class="badge">日</div>
+      <div>
+        <div class="t1">中国人民大学历史学院</div>
+        <div class="t2">RENNMIN UNIVERSITY OF CHINA · SCHOOL OF HISTORY</div>
+      </div>
+    </div>
+    <h1>个人日程 <em>2026年秋季学期</em></h1>
+    <div class="sub">9月 — 10月 · 点击日历中带红点的日期查看当天安排</div>
+  </header>
+
+  <div class="cal">
+    <div class="cal-head"><div class="ym">2026年 9月</div><div class="tip">👇 点日期看安排</div></div>
+    <div class="cal-week"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>
+    <div class="cal-grid" id="grid9"></div>
+  </div>
+
+  <div class="cal">
+    <div class="cal-head"><div class="ym">2026年 10月</div><div class="tip">👇 点日期看安排</div></div>
+    <div class="cal-week"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>
+    <div class="cal-grid" id="grid10"></div>
+  </div>
+
+  <div class="detail" id="detail">
+    <div class="d-date"><div class="d1" id="dTitle"></div><div class="d2" id="dWeek"></div></div>
+    <div id="dList"></div>
+  </div>
+
+  <footer>
+    <b>个人日程</b> · 2026年秋季学期<br>
+    持续更新中 · 以最新通知为准
+  </footer>
+</div>
+
+<script>
+/* ============ 日程数据（键：'月-日'） ============ */
+const EVENTS = {
+  "9-14": [
+    {
+      time:"全天", soft:true,
+      name:"和男朋友约会 💕",
+      loc:"📍 待定",
+      note:"",
+      memo:"date"
+    }
+  ],
+  "9-15": [
+    {
+      time:"15:00",
+      name:"英语六级 · 信息确认报名",
+      loc:"📍 六级报名系统（线上）",
+      note:"下午3点开始，提前登录报名系统，<b>完成信息确认</b>"
+    }
+  ],
+  "9-16": [
+    {
+      time:"14:00（13:45 前到场）",
+      name:"「长征，青春的会师」青年思政公开课",
+      loc:"📍 通州校区 先锋剧场",
+      note:"弘扬长征精神青年思政公开课\n⚠️ <b>提前15分钟</b>到场签到落座（13:45 前）"
+    }
+  ],
+  "9-23": [
+    {
+      time:"10:00",
+      name:"文化遗产数字化沙龙讲座 · 汇报小论文",
+      loc:"📍 中关村校区",
+      note:"上午10点；带好小论文，沙龙上汇报",
+      memo:"salon"
+    }
+  ],
+  "9-30": [
+    {
+      time:"12:00 左右集合",
+      name:"参观大运河博物馆",
+      loc:"📍 集合地点待通知",
+      note:"中午12点左右集合出发",
+      memo:"museum"
+    }
+  ],
+  "10-23": [
+    {
+      time:"上课时间",
+      name:"考古文献阅读课 · 类型学汇报",
+      loc:"📍 课堂（按课表）",
+      note:"韩老师的考古文献阅读课，进行<b>类型学汇报</b>\n提前准备好汇报材料",
+      memo:"typology"
+    }
+  ]
+};
+
+/* ============ 渲染两个月历 ============ */
+const today = new Date();
+const WEEKS = ['周日','周一','周二','周三','周四','周五','周六'];
+
+function buildGrid(year, month, gridEl) {
+  const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  for (let i = 0; i < firstDow; i++) {
+    const c = document.createElement('div'); c.className = 'day'; gridEl.appendChild(c);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = (month + 1) + '-' + d;
+    const has = !!EVENTS[key];
+    const c = document.createElement('div');
+    c.className = 'day' + (has ? ' has' : '');
+    if (today.getFullYear()===year && today.getMonth()===month && today.getDate()===d) c.classList.add('today');
+    c.innerHTML = '<span>' + d + '</span>' + (has ? '<span class="dot"></span>' : '');
+    if (has) c.onclick = () => showDay(year, month, d, c);
+    gridEl.appendChild(c);
+  }
+}
+
+buildGrid(2026, 8, document.getElementById('grid9'));
+buildGrid(2026, 9, document.getElementById('grid10'));
+
+function showDay(year, month, d, cell) {
+  document.querySelectorAll('.cal-grid .day.active').forEach(e => e.classList.remove('active'));
+  cell.classList.add('active');
+  const key = (month + 1) + '-' + d;
+  const dt = new Date(year, month, d);
+  document.getElementById('dTitle').textContent = (month + 1) + '月' + d + '日';
+  document.getElementById('dWeek').textContent = WEEKS[dt.getDay()];
+  document.getElementById('dList').innerHTML = EVENTS[key].map(ev => `
+    <div class="event">
+      <span class="time${ev.soft ? ' soft' : ''}">${ev.time}</span>
+      <div class="name">${ev.name}</div>
+      <div class="loc">${ev.loc}</div>
+      ${ev.note ? '<div class="note">' + ev.note + '</div>' : ''}
+      ${ev.memo ? '<textarea class="memo" data-memo="' + ev.memo + '" placeholder="✏️ 点这里写自己的备注（仅保存在你自己的设备上）" oninput="saveMemo(this.dataset.memo, this.value)"></textarea>' : ''}
+    </div>`).join('');
+  document.querySelectorAll('#dList .memo').forEach(t => {
+    t.value = localStorage.getItem('my_memo_' + t.dataset.memo) || '';
+  });
+  const det = document.getElementById('detail');
+  det.classList.remove('show'); void det.offsetWidth; det.classList.add('show');
+  det.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function saveMemo(k, v){ localStorage.setItem('my_memo_' + k, v); }
+
+/* 默认打开：今天有安排则今天，否则最近的一个安排日 */
+(function(){
+  const keys = Object.keys(EVENTS).sort((a,b)=>{
+    const [am,ad]=a.split('-').map(Number), [bm,bd]=b.split('-').map(Number);
+    return am===bm ? ad-bd : am-bm;
+  });
+  const tk = (today.getMonth()+1) + '-' + today.getDate();
+  let pick = EVENTS[tk] && today.getFullYear()===2026 ? tk : keys[0];
+  const [pm, pd] = pick.split('-').map(Number);
+  const grid = pm === 9 ? document.getElementById('grid9') : document.getElementById('grid10');
+  const firstDow = (new Date(2026, pm-1, 1).getDay() + 6) % 7;
+  showDay(2026, pm-1, pd, grid.children[firstDow + pd - 1]);
+})();
+</script>
+</body>
+</html>
